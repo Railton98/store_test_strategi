@@ -23,7 +23,7 @@ services:
       - MYSQL_PASSWORD=strategi
   # PHP (with Nginx)
   app:
-    image: ambientum/php:7.2-nginx
+    image: ambientum/php:7.3-nginx
     container_name: strategi-app
     depends_on:
       - db
