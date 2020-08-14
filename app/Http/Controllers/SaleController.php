@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class SaleController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Product $product)
     {
-        $products = Product::all();
+        $product->load('sales');
 
-        return view('products.index', compact('products'));
+        return view('sales.index', compact('product'));
     }
 
     /**
@@ -26,7 +27,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        //
     }
 
     /**
@@ -35,31 +36,40 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Product $product)
     {
-        Product::create($request->all());
+        if ($request->quantity > $product->quantity) {
+            return redirect()->back()->with('error', 'O Produto desejado possuí somente ' . $product->quantity . ' unidades em estoque!');
+        }
 
-        return redirect()->route('products.index')->with('success', 'produto cadastrado com sucesso');
+        $product->sales()->create([
+            'total' => $request->quantity * $product->unit_price
+        ]);
+
+        $product->quantity -= $request->quantity;
+        $product->save();
+
+        return redirect()->route('products.index')->with('success', 'Compra realizada com sucesso!');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show(Sale $sale)
     {
-        return view('products.show', compact('product'));
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit(Sale $sale)
     {
         //
     }
@@ -68,10 +78,10 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
+     * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Sale $sale)
     {
         //
     }
@@ -79,10 +89,10 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Product  $product
+     * @param  \App\Models\Sale  $sale
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy(Sale $sale)
     {
         //
     }

@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', 'products');
 
 Route::resource('products', 'ProductController')->except(['destroy']);
+Route::resource('products.sales', 'SaleController')->except(['destroy']);
 
-Auth::routes();
+// Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// Route::get('/home', 'HomeController@index')->name('home');
